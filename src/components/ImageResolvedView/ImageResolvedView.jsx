@@ -20,7 +20,7 @@ function ImageResolvedView({ pictures, loadMore, loading, openModal }) {
         ))}
       </ul>
       {loading && <ImagePendingView message={'Loading...'} />}
-      {pictures.length >= 1 && <Button onClick={loadMore} />}
+      {pictures.length >= 1 && !loading && <Button onClick={loadMore} />}
     </>
   );
 }

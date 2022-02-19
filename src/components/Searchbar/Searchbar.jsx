@@ -29,7 +29,7 @@ class Searchbar extends Component {
 
     return (
       <>
-        <header className={s.searchbar}>
+        <header className={s.Searchbar}>
           <form className={s.SearchForm} onSubmit={this.formSubmitHandler}>
             <button type="submit" className={s.SearchFormButton}>
               <RiSearch2Line className={s.SearchFormIcon} />
