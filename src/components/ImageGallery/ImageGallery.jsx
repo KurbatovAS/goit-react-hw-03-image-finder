@@ -57,7 +57,13 @@ class ImageGallery extends Component {
       .catch(error => {
         this.setState({ error, status: 'rejected' });
       })
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => {
+        this.setState({ loading: false });
+
+        if (fetchPage > 1) {
+          this.scrollDown();
+        }
+      });
   }
 
   loadMoreHandler = () => {
@@ -65,6 +71,13 @@ class ImageGallery extends Component {
       return { fetchPage: (prevState.fetchPage += 1) };
     });
   };
+
+  scrollDown() {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
+  }
 
   toggleModal = (modalImg, tags) => {
     this.setState(prevState => ({
