@@ -25,7 +25,7 @@ class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
-    // const prevPage = prevState.fetchPage;
+    const prevPage = prevState.fetchPage;
     const { searchQuery } = this.props;
     const { fetchPage } = this.state;
 
@@ -34,10 +34,7 @@ class ImageGallery extends Component {
       this.fetchImages(searchQuery, fetchPage);
     }
 
-    console.log('prevState.fetchPage', prevState.fetchPage);
-    console.log('this.state.fetchPage', this.state.fetchPage);
-
-    if (prevState.fetchPage !== this.state.fetchPage) {
+    if (prevPage !== fetchPage) {
       this.setState({ loading: true });
       this.fetchImages(searchQuery, fetchPage);
     }
