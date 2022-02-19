@@ -11,7 +11,6 @@ class Searchbar extends Component {
   };
 
   inputChangeHandler = e => {
-    console.log('e.target.value.toLowerCase()', e.target.value.toLowerCase());
     this.setState({ inputValue: e.target.value.toLowerCase() });
   };
 
@@ -30,17 +29,14 @@ class Searchbar extends Component {
 
     return (
       <>
-        <header className="searchbar">
-          <form className="form" onSubmit={this.formSubmitHandler}>
-            <button type="submit" className="button">
-              <span className="button-label">
-                <RiSearch2Line style={{ marginRight: 8 }} />
-                Search
-              </span>
+        <header className={s.searchbar}>
+          <form className={s.SearchForm} onSubmit={this.formSubmitHandler}>
+            <button type="submit" className={s.SearchFormButton}>
+              <RiSearch2Line className={s.SearchFormIcon} />
             </button>
 
             <input
-              className="input"
+              className={s.SearchFormInput}
               type="text"
               name="searchInput"
               autoComplete="off"

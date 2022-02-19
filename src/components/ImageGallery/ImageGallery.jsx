@@ -1,68 +1,63 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import s from './ImageGallery.module.css';
-import ImageGalleryItem from '../ImageGalleryItem';
-import Button from '../Button';
 import { toast } from 'react-toastify';
-// import Notification from '../Notification';
+import PropTypes from 'prop-types';
+// import s from './ImageGallery.module.css';
+import Modal from '../Modal';
+import imagesAPI from '../services';
+import ImagePendingView from '../ImagePendingView';
+import ImageErrorView from '../ImageErrorView';
+import ImageIdleView from '../ImageIdleView';
+import ImageResolvedView from '../ImageResolvedView';
 
 class ImageGallery extends Component {
   state = {
     fetchPage: 1,
-    loading: false,
     pictures: [],
     error: null,
+    loading: false,
+    status: 'idle',
+    showModal: false,
+    pictureUrl: null,
+    tags: null,
   };
 
-  componentDidMount() {
-    this.fetchImages();
-  }
+  componentDidMount() {}
 
   componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
     const currentSearchQuery = this.props.searchQuery;
     const prevPage = prevState.fetchPage;
     const currentPage = this.state.fetchPage;
+    const { searchQuery } = this.props;
+    const { fetchPage } = this.state;
 
     if (prevSearchQuery !== currentSearchQuery) {
-      this.setState({ pictures: [] });
-      this.fetchImages();
+      this.setState({ status: 'pending', pictures: [] });
+      this.fetchImages(searchQuery, fetchPage);
     }
 
     if (prevPage !== currentPage) {
-      this.fetchImages();
+      this.setState({ loading: true });
+      this.fetchImages(searchQuery, fetchPage);
     }
   }
 
-  async fetchImages() {
-    const { searchQuery } = this.props;
-    const { fetchPage } = this.state;
-    const url = 'https://pixabay.com/api/';
-    const key = '24488869-ab3c2489f9260f0be3e523737';
-
-    this.setState({ loading: true });
-    await fetch(
-      `${url}?q=${searchQuery}&page=${fetchPage}&key=${key}&image_type=photo&orientation=horizontal&per_page=6`
-    )
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject(
-          new Error(`Нет картинки с именем ${searchQuery}`)
-        );
-      })
+  fetchImages(searchQuery, fetchPage) {
+    imagesAPI(searchQuery, fetchPage)
       .then(res => {
-        console.log('res', res);
         if (res.hits.length === 0) {
+          this.setState({ status: 'idle' });
           return toast.error(`Нет картинки с именем ${searchQuery}`);
         }
         return this.setState(prevState => {
-          return { pictures: [...prevState.pictures, ...res.hits] };
+          return {
+            pictures: [...prevState.pictures, ...res.hits],
+            status: 'resolved',
+          };
         });
       })
       .catch(error => {
-        this.setState({ error });
+        this.setState({ error, status: 'rejected' });
       })
       .finally(() => this.setState({ loading: false }));
   }
@@ -73,29 +68,46 @@ class ImageGallery extends Component {
     });
   };
 
+  toggleModal = (modalImg, tags) => {
+    this.setState(prevState => ({
+      showModal: !prevState.showModal,
+      pictureUrl: modalImg,
+      tags,
+    }));
+  };
   render() {
-    const { pictures, loading, error } = this.state;
+    const { pictures, error, loading, status, showModal, pictureUrl, tags } =
+      this.state;
 
-    return (
-      <>
-        {error && <h1>{error.message}</h1>}
-        {pictures && (
-          <ul className={s.gallery}>
-            {pictures.map(picture => (
-              <ImageGalleryItem
-                key={picture.id}
-                id={picture.id}
-                imgSrc={picture.webformatURL}
-                tags={picture.tags}
-              />
-            ))}
-          </ul>
-        )}
+    if (status === 'idle') {
+      return <ImageIdleView text={'Введите поисковый запрос'} />;
+    }
 
-        {loading && <h2>Loading...</h2>}
-        {pictures.length >= 1 && <Button onClick={this.loadMoreHandler} />}
-      </>
-    );
+    if (status === 'pending') {
+      return <ImagePendingView message={'Loading...'} />;
+    }
+
+    if (status === 'rejected') {
+      return <ImageErrorView message={error.message} />;
+    }
+
+    if (status === 'resolved') {
+      return (
+        <>
+          {showModal && (
+            <Modal onClose={this.toggleModal}>
+              <img src={pictureUrl} alt={tags} />
+            </Modal>
+          )}
+          <ImageResolvedView
+            pictures={pictures}
+            loadMore={this.loadMoreHandler}
+            loading={loading}
+            openModal={this.toggleModal}
+          />
+        </>
+      );
+    }
   }
 }
 

@@ -4,7 +4,7 @@ import s from './Button.module.css';
 function Button({ onClick }) {
   return (
     <>
-      <button type="button" onClick={onClick}>
+      <button type="button" onClick={onClick} className={s.Button}>
         More pictures
       </button>
     </>
