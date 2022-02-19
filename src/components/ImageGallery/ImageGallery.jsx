@@ -25,18 +25,16 @@ class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
-    const currentSearchQuery = this.props.searchQuery;
-    const prevPage = prevState.fetchPage;
-    const currentPage = this.state.fetchPage;
+    // const prevPage = prevState.fetchPage;
     const { searchQuery } = this.props;
     const { fetchPage } = this.state;
 
-    if (prevSearchQuery !== currentSearchQuery) {
+    if (prevSearchQuery !== searchQuery) {
       this.setState({ status: 'pending', pictures: [] });
       this.fetchImages(searchQuery, fetchPage);
     }
 
-    if (prevPage !== currentPage) {
+    if (prevState.fetchPage !== this.state.fetchPage) {
       this.setState({ loading: true });
       this.fetchImages(searchQuery, fetchPage);
     }
