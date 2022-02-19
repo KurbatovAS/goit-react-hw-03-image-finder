@@ -34,6 +34,9 @@ class ImageGallery extends Component {
       this.fetchImages(searchQuery, fetchPage);
     }
 
+    console.log('prevState.fetchPage', prevState.fetchPage);
+    console.log('this.state.fetchPage', this.state.fetchPage);
+
     if (prevState.fetchPage !== this.state.fetchPage) {
       this.setState({ loading: true });
       this.fetchImages(searchQuery, fetchPage);
@@ -67,8 +70,10 @@ class ImageGallery extends Component {
   }
 
   loadMoreHandler = () => {
-    this.setState(prevState => {
-      return { fetchPage: (prevState.fetchPage += 1) };
+    const { fetchPage } = this.state;
+
+    this.setState({
+      fetchPage: fetchPage + 1,
     });
   };
 
