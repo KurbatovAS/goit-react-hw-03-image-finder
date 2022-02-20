@@ -26,8 +26,10 @@ class ImageGallery extends Component {
   componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
     const prevPage = prevState.fetchPage;
+    console.log('prevPage', prevPage);
     const { searchQuery } = this.props;
     const { fetchPage } = this.state;
+    console.log('fetchPage', fetchPage);
 
     if (prevSearchQuery !== searchQuery) {
       this.setState({ status: 'pending', pictures: [] });
@@ -39,6 +41,18 @@ class ImageGallery extends Component {
       this.fetchImages(searchQuery, fetchPage);
     }
   }
+
+  loadMoreHandler = () => {
+    // const { fetchPage } = this.state;
+
+    this.setState(prevState => {
+      return { fetchPage: (prevState.fetchPage += 1) };
+
+      // this.setState(prev => ({
+      //   fetchPage: prev.fetchPage + 1,
+      // }));
+    });
+  };
 
   fetchImages(searchQuery, fetchPage) {
     imagesAPI(searchQuery, fetchPage)
@@ -65,14 +79,6 @@ class ImageGallery extends Component {
         }
       });
   }
-
-  loadMoreHandler = () => {
-    const { fetchPage } = this.state;
-
-    this.setState({
-      fetchPage: fetchPage + 1,
-    });
-  };
 
   scrollDown() {
     window.scrollTo({
